@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+main{
+    background-image: url('/src/assets/img/bgi.png');
+}
+
+@config "../../tailwind.config.js"
+
+
