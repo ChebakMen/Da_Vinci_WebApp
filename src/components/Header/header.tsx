@@ -1,4 +1,4 @@
-import '../../styles/Header.scss';
+import '../../styles/header.scss';
 
 import { Button } from '@heroui/button';
 import { Link } from 'react-router-dom';
@@ -22,6 +22,7 @@ export const Header = () => {
         <Button color="default" className="page-header__btn page-header__btn--log" variant="ghost">
           <Link to={'/avtorization'}>Войти</Link>
         </Button>
+        <div className="page-header__burger"></div>
       </div>
     </header>
   );

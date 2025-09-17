@@ -1,4 +1,4 @@
-import '../../styles/About.scss';
+import '../../styles/about.scss';
 
 import Arrow from '/src/assets/img/Arrow.svg';
 import { Button } from '@heroui/button';
@@ -34,6 +34,7 @@ export const About = () => {
             </div>
           </div>
         </div>
+
         <div className="about-us__bigLogo"></div>
       </div>
     </div>
