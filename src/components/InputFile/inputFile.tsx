@@ -1,5 +1,8 @@
+import { Button } from '@heroui/button';
 import '../../styles/inputFile.scss';
 import React, { useState, useRef } from 'react';
+import Arrow from '/src/assets/img/Arrow.svg';
+import { useMediaQuery } from '@mui/material';
 
 interface InputFileProps {
   onFileLoaded: (newKeypoints: any) => void;
@@ -57,6 +60,14 @@ export const InputFile: React.FC<InputFileProps> = ({ onFileLoaded }) => {
       setFile(e.target.files[0]);
     }
   };
+  const handleCancel = () => {
+    // очищаем выбранный файл из состояния
+    setFile(null);
+    // очищаем значение input через ref
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleUpload = async () => {
     // onFileLoaded();
@@ -77,23 +88,29 @@ export const InputFile: React.FC<InputFileProps> = ({ onFileLoaded }) => {
         //   method: 'GET',
         // });
 
-        // const newKeypoints = await result.json();
-
-        // console.log(newKeypoints);
-        setStatus('success');
-        // onFileLoaded(newKeypoints);
-        onFileLoaded({
-          frame_1: [
-            { keypoint: 'nose', position: { x: 10, y: 20 } },
-            { keypoint: 'eye', position: { x: 15, y: 25 } },
-          ],
+        const result = await fetch('https://mocki.io/v1/05cca9d5-8014-4841-94ab-f899d2cf2af9', {
+          method: 'GET',
         });
+
+        const newKeypoints = await result.json();
+
+        console.log(newKeypoints);
+        setStatus('success');
+        onFileLoaded(newKeypoints);
+        // onFileLoaded({
+        //   frame_1: [
+        //     { keypoint: 'nose', position: { x: 10, y: 20 } },
+        //     { keypoint: 'eye', position: { x: 15, y: 25 } },
+        //   ],
+        // });
       } catch (error) {
         console.error(error);
         setStatus('fail');
       }
     }
   };
+
+  const isSmallScreen = useMediaQuery('(max-width:500px)');
 
   return (
     <div className="input-file__container container">
@@ -104,7 +121,9 @@ export const InputFile: React.FC<InputFileProps> = ({ onFileLoaded }) => {
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}>
-        <label htmlFor="file" className="input-file__input">
+        <label
+          htmlFor="file"
+          className={`input-file__input ${isSmallScreen && file ? 'hidden' : ''}`}>
           <span className="input-file__input-title">Перенесите файл</span>
           или
           <input id="file" type="file" onChange={handleFileChange} ref={fileInputRef} />
@@ -112,7 +131,7 @@ export const InputFile: React.FC<InputFileProps> = ({ onFileLoaded }) => {
 
         {file && (
           <section className="input-file__info">
-            <h2 className="input-file__info-title ">Информация о файле</h2>
+            <h2 className="input-file__info-title ">Выбранный файл</h2>
             <ul className="input-file__ul">
               <li className="input-file__li">
                 <p className="input-file__info-text">Название</p>
@@ -128,9 +147,23 @@ export const InputFile: React.FC<InputFileProps> = ({ onFileLoaded }) => {
               </li>
             </ul>
             {file && (
-              <button onClick={handleUpload} className="input-file__submit">
-                Загрузить
-              </button>
+              <div className="input-file__btns">
+                <Button
+                  color="default"
+                  className="input-file__btn-cls"
+                  variant="ghost"
+                  onClick={handleCancel}>
+                  Отменить
+                </Button>
+                <Button
+                  color="default"
+                  className="input-file__btn"
+                  variant="ghost"
+                  onClick={handleUpload}>
+                  Загрузить
+                  <img src={Arrow} alt="" />
+                </Button>
+              </div>
             )}
             <Result status={status} />
           </section>

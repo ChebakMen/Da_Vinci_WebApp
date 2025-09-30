@@ -52,6 +52,11 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    margin-left: -100px;
+
+    @media (max-width: 1000px) {
+      margin-left: 0px;
+    }
   }
   &__bcg-i {
     position: absolute;
@@ -225,7 +230,7 @@
     }
 
     @media (max-width: 1600px) {
-      left: 2%;
+      left: 8%;
     }
     @media (max-width: 1400px) {
       left: 15%;
@@ -312,7 +317,7 @@
     // height: 400px; /* или ваша высота */
     width: 100px; /* ширина блока по желанию */
 
-    @media (max-width: 500px) {
+    @media (max-width: 1000px) {
       display: none;
     }
   }
@@ -334,7 +339,7 @@
   &__vertical-text {
     writing-mode: vertical-rl;
     font-family: 'Unbounded';
-    transform: rotate(0deg); /* чтобы текст читался сверху вниз */
+    transform: rotate(0deg);
     font-weight: 500;
     font-size: 15px;
     color: #22333b;

@@ -39,17 +39,17 @@
 
   &__logo {
     width: 120px;
-    height: 50px;
+    height: 60px;
     @media (max-width: 460px) {
       width: 100px;
     }
   }
 
   &__img {
-    margin-top: -10px;
+    margin-top: -7px;
     width: 130px;
     height: 150px;
-    max-height: 60px;
+    max-height: 70px;
     background-image: url('/src/assets/img/logo_xl.svg');
     background-repeat: no-repeat;
     background-size: 100px auto;
