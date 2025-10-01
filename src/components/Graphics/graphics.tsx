@@ -2,7 +2,6 @@ import '../../styles/graphics.scss';
 import React, { useState, useEffect } from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
 import Slider from '@mui/material/Slider';
-import { axisClasses } from '@mui/x-charts';
 import { Select, SelectItem } from '@heroui/select';
 import type { SharedSelection } from '@heroui/react';
 type KeypointData = {
@@ -48,6 +47,7 @@ interface GraphicsProps {
 }
 
 const Graphics: React.FC<GraphicsProps> = ({ keypoints }) => {
+  type Key = string | number;
   const [data, setData] = useState<KeypointData | null>(null);
   const [coordinates, setCoordinates] = useState<KeypointCoordinates>([]);
   const [value, setValue] = React.useState<number[]>([0, 25]);
@@ -79,7 +79,7 @@ const Graphics: React.FC<GraphicsProps> = ({ keypoints }) => {
     }
   };
 
-  const handleChange = (event: Event, newValue: number | number[], activeThumb: number) => {
+  const handleChange = (_event: Event, newValue: number | number[], activeThumb: number) => {
     if (!Array.isArray(newValue)) {
       return;
     }
@@ -269,7 +269,7 @@ const Graphics: React.FC<GraphicsProps> = ({ keypoints }) => {
             xAxis={[
               {
                 label: 'Кадры',
-                data: coordinates.map((point, index) => index + 1) || [],
+                data: coordinates.map((_, index) => index + 1) || [],
                 min: value[0],
                 max: value[1],
               },
@@ -305,34 +305,3 @@ const Graphics: React.FC<GraphicsProps> = ({ keypoints }) => {
 };
 
 export default Graphics;
-
-// {parsedData && parsedData.length > 0 && (
-//   <LineChart
-//     xAxis={[
-//       {
-//         label: "Ось Y",
-//         data: parsedData[0].yData || [],
-//       },
-//     ]}
-//     yAxis={[
-//       {
-//         label: "Ось X",
-//       },
-//     ]}
-//     series={[
-//       {
-//         data: parsedData[0].xData || [],
-//         color: "black",
-//       },
-//     ]}
-//     margin={{ left: 55, right: 30, top: 50, bottom: 50 }}
-//     width={550}
-//     height={450}
-//     grid={{ vertical: true, horizontal: true }}
-//     sx={{
-//       [`.${axisClasses.left} .${axisClasses.label}`]: {
-//         transform: "translate(-10px, 0)",
-//       },
-//     }}
-//   />
-// )}

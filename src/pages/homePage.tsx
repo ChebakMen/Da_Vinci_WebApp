@@ -5,6 +5,7 @@ import { Reviews } from '@/components/Reviews/reviews';
 import { Technologies } from '@/components/Technologies/technologies';
 
 import '../styles/homePage.scss';
+import Footer from '@/components/Footer/footer';
 
 export const HomePage = () => {
   return (
@@ -20,7 +21,7 @@ export const HomePage = () => {
           </div>
         </div>
       </main>
-      {/* <Footer /> */}
+      <Footer />
     </>
   );
 };

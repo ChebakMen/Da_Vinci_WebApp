@@ -2,7 +2,6 @@ import '../../styles/parametrs.scss';
 import React, { useState, useEffect } from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
 import Slider from '@mui/material/Slider';
-import { axisClasses } from '@mui/x-charts';
 import { Button } from '@heroui/button';
 import { Select, SelectItem } from '@heroui/select';
 import type { SharedSelection } from '@heroui/react';
@@ -75,6 +74,7 @@ const processKeypointData = (
 };
 
 export const Parametrs = () => {
+  type Key = string | number;
   const [data, setData] = useState<KeypointData | null>(null);
   const [coordinates, setCoordinates] = useState<KeypointCoordinates>([]);
   const [value, setValue] = React.useState<number[]>([0, 25]);
@@ -101,7 +101,7 @@ export const Parametrs = () => {
     }
   };
 
-  const handleChange = (event: Event, newValue: number | number[], activeThumb: number) => {
+  const handleChange = (_event: Event, newValue: number | number[], activeThumb: number) => {
     if (!Array.isArray(newValue)) {
       return;
     }
@@ -247,7 +247,7 @@ export const Parametrs = () => {
             xAxis={[
               {
                 label: 'Шаги',
-                data: coordinates.map((point, index) => index + 1) || [],
+                data: coordinates.map((_, index) => index + 1) || [],
                 min: value[0],
                 max: value[1],
               },

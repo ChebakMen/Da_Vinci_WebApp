@@ -25,7 +25,7 @@ export const InputFile: React.FC<InputFileProps> = ({ onFileLoaded }) => {
   const [status, setStatus] = useState<'initial' | 'uploading' | 'success' | 'fail'>('initial');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropContainerRef = useRef<HTMLDivElement>(null);
-  const [isDragActive, setIsDragActive] = useState(false);
+  const [_isDragActive, setIsDragActive] = useState(false);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
