@@ -8,21 +8,9 @@ interface InputFileProps {
   onFileLoaded: (newKeypoints: any) => void;
 }
 
-const Result = ({ status }: { status: string }) => {
-  if (status === 'success') {
-    return <p>✅ File uploaded successfully!</p>;
-  } else if (status === 'fail') {
-    return <p>❌ File upload failed!</p>;
-  } else if (status === 'uploading') {
-    return <p>⏳ Uploading selected file...</p>;
-  } else {
-    return null;
-  }
-};
-
 export const InputFile: React.FC<InputFileProps> = ({ onFileLoaded }) => {
   const [file, setFile] = useState<File | null>(null);
-  const [status, setStatus] = useState<'initial' | 'uploading' | 'success' | 'fail'>('initial');
+  const [_status, setStatus] = useState<'initial' | 'uploading' | 'success' | 'fail'>('initial');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropContainerRef = useRef<HTMLDivElement>(null);
   const [_isDragActive, setIsDragActive] = useState(false);
@@ -165,7 +153,6 @@ export const InputFile: React.FC<InputFileProps> = ({ onFileLoaded }) => {
                 </Button>
               </div>
             )}
-            <Result status={status} />
           </section>
         )}
       </div>

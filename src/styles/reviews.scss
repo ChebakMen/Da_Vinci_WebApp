@@ -4,27 +4,130 @@
   justify-content: center;
   width: 100%;
   height: 580px;
+  margin-bottom: 80px;
 
   @media (max-width: 500px) {
+    height: auto;
+  }
+
+  @media (max-width: 500px) {
+    // display: none;
+  }
+
+  &__nav-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    // height: 400px; /* или ваша высота */
+    width: 100px; /* ширина блока по желанию */
+
+    @media (max-width: 1000px) {
+      display: none;
+    }
+  }
+
+  &__circle {
+    width: 10px;
+    height: 10px;
+    background-color: black;
+    border-radius: 50%;
+  }
+
+  &__line {
+    width: 3px;
+    flex-grow: 1;
+    background-color: black;
+    min-height: 50px;
+  }
+
+  &__vertical-text {
+    writing-mode: vertical-rl;
+    font-family: 'Unbounded';
+    transform: rotate(0deg); /* чтобы текст читался сверху вниз */
+    font-weight: 500;
+    font-size: 15px;
+    color: #22333b;
+    padding: 45px 0;
+    text-align: center;
+  }
+
+  &__wrapper-black_block {
     display: none;
+
+    @media (max-width: 500px) {
+      display: block;
+      width: 88%;
+      align-items: start;
+      margin-bottom: 10px;
+    }
+  }
+  &__black_block {
+    width: 25px;
+    height: 25px;
+    background-color: #000000;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-left: -100px;
+    position: relative;
+
+    @media (max-width: 1000px) {
+      margin-left: 0px;
+    }
+    @media (max-width: 400px) {
+      margin-top: 50px;
+    }
+  }
+
+  &__title {
+    font-family: 'Unbounded';
+    font-size: 35px;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 0px;
+    position: relative;
+    z-index: 2;
+
+    @media (max-width: 400px) {
+      text-align: start;
+      padding: 0 0 0 20px;
+
+      font-size: 30px;
+    }
   }
 
   &__container {
     margin: 0;
     width: 1100px;
-    padding: 60px 30px;
+    padding: 30px 30px;
+
+    @media (max-width: 500px) {
+      padding: 10px 30px;
+      width: 98%;
+    }
+    @media (max-width: 400px) {
+      width: 100%;
+    }
 
     &-card {
       background: rgba(183, 182, 182, 0.2); /* Цвет фона с прозрачностью */
       padding: 30px;
       border-radius: 20px;
-      backdrop-filter: blur(2px); /* Эффект матового стекла */
+      backdrop-filter: blur(4px); /* Эффект матового стекла */
       margin-bottom: 10px;
       &-img {
         height: 150px;
         width: 100%;
         border-radius: 16px;
         margin-bottom: 15px;
+
+        @media (max-width: 400px) {
+          height: 120px;
+        }
       }
 
       &-text {
@@ -40,4 +143,61 @@
       }
     }
   }
+
+  &__bcg-i {
+    position: absolute;
+    z-index: 0;
+    width: 85%;
+    height: 700px;
+    left: 15%;
+    background-image: url('/src/assets/img/t.svg');
+    background-repeat: no-repeat;
+
+    // @media (max-width: 1600px) {
+    //   width: 900px;
+    //   height: 1060px;
+    // }
+    // @media (max-width: 1600px) {
+    //   width: 1000px;
+    //   height: 1160px;
+    // }
+    // @media (max-width: 1400px) {
+    //   width: 1000px;
+    //   height: 1340px;
+    // }
+    // @media (max-width: 1200px) {
+    //   left: 0%;
+    //   width: 900px;
+    //   margin-top: 50px;
+    // }
+
+    @media (max-width: 400px) {
+      // margin-left: -120px;
+      left: 0;
+      background-size: contain;
+      width: 100%;
+      height: 800px;
+      background-size: 1400px 1400px;
+      background-position: center top;
+    }
+
+    // @media (max-width: 500px) {
+    //   display: none;
+    // }
+  }
+}
+
+.slick-list {
+  margin: 0; /* убираем отрицательный margin */
+  overflow: hidden; /* оставляем, чтобы скрыть переполнение */
+}
+
+.slick-slide > div {
+  padding: 0 10px; /* внутренние отступы для карточек внутри каждого слайда */
+  box-sizing: border-box;
+}
+
+.slick-prev::before,
+.slick-next::before {
+  display: none;
 }
