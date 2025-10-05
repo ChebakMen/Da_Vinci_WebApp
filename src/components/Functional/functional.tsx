@@ -1,5 +1,5 @@
 import '../../styles/functional.scss';
-import { useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { Tabs, Tab } from '@heroui/tabs';
 import InputFile from '../InputFile/inputFile';
 import Graphics from '../Graphics/graphics';
@@ -16,7 +16,9 @@ type KeypointData = {
   }[];
 }[];
 
-export const Functional = () => {
+type FuncProps = {};
+
+export const Functional = forwardRef<HTMLDivElement, FuncProps>((_props, ref) => {
   const [fileLoaded, setFileLoaded] = useState(false);
   const [keypoints, setKeypoints] = useState<KeypointData>([]);
 
@@ -28,7 +30,7 @@ export const Functional = () => {
   };
 
   return (
-    <div className="functional">
+    <div className="functional" ref={ref}>
       <div className="functional__nav-vertical">
         <div className="functional__line"></div>
         <div className="functional__circle homePage__circle-bottom"></div>
@@ -60,4 +62,4 @@ export const Functional = () => {
       </div>
     </div>
   );
-};
+});

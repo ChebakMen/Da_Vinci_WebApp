@@ -4,10 +4,15 @@ import 'slick-carousel/slick/slick-theme.css';
 
 import Slider from 'react-slick';
 
-import P1 from '/src/assets/img/image-1.png';
-import P2 from '/src/assets/img/image-2.png';
-import P3 from '/src/assets/img/image.png';
-import { useEffect, useState } from 'react';
+import P1 from '/src/assets/img/img_rews_1.jpg';
+import P2 from '/src/assets/img/img_rews_2.jpg';
+import P3 from '/src/assets/img/img_rews_3.jpg';
+import P4 from '/src/assets/img/img_rews_4.jpg';
+
+// import P1 from '/src/assets/img/image-1.png';
+// import P2 from '/src/assets/img/image-2.png';
+// import P3 from '/src/assets/img/image.png';
+import { forwardRef, useEffect, useState } from 'react';
 
 function SampleNextArrow(props: any) {
   const { className, style, onClick } = props;
@@ -50,32 +55,34 @@ function SamplePrevArrow(props: any) {
 
 const data = [
   {
-    name: 'Дуэйн Джонсон',
+    name: 'Заговоров М.А',
     img: P1,
     review:
-      'После двух лет непрерывных исследований и разработок мы рады объявить о выпуске Ultralytics YOLOv8 . Эта модель YOLO устанавливает новый стандарт в обнаружении и сегментации в реальном времени, облегчая разработку простых и эффективных ИИ-решений для широкого спектра сценариев использования.',
+      'Проект предоставляет уникальное решение для точной оценки физической активности пациентов с помощью анализа видеозаписей. Пользовался в течении нескольких дней. Мне понравилось, было удобно и понятно. Также очень рекомендую для медицинских специалистов.',
   },
   {
-    name: 'Райн Гослинг',
+    name: 'Шитовкина В.И.',
     img: P2,
     review:
-      'После двух лет непрерывных исследований и разработок мы рады объявить о выпуске Ultralytics YOLOv8 . Эта модель YOLO устанавливает новый стандарт в обнаружении и сегментации в реальном времени, облегчая разработку простых и эффективных ИИ-решений для широкого спектра сценариев использования.',
+      'Использование этой системы значительно облегчило процесс мониторинга восстановления пациентов с заболеваниями опорно-двигательного аппарата. Программа реально помогает врачам разрабатывать персонализированные планы и ускоряет период реабилитации. Приятно видеть, как технологии улучшают медицину.',
   },
   {
-    name: 'Бред Пит',
+    name: 'Зирко К.А.',
     img: P3,
     review:
-      'После двух лет непрерывных исследований и разработок мы рады объявить о выпуске Ultralytics YOLOv8 . Эта модель YOLO устанавливает новый стандарт в обнаружении и сегментации в реальном времени, облегчая разработку простых и эффективных ИИ-решений для широкого спектра сценариев использования.',
+      'Система реабилитации на основе видеоанализа – это настоящее прорывное решение. Она помогает как врачам, так и пациентам увидеть динамику восстановления в деталях и делать своевременные корректировки. Благодаря такому подходу, уход становится максимально персонализированным и результативным.',
   },
   {
-    name: 'Леонардо Ди Каприо',
-    img: P1,
+    name: 'Кучер О.В.',
+    img: P4,
     review:
-      'После двух лет непрерывных исследований и разработок мы рады объявить о выпуске Ultralytics YOLOv8 . Эта модель YOLO устанавливает новый стандарт в обнаружении и сегментации в реальном времени, облегчая разработку простых и эффективных ИИ-решений для широкого спектра сценариев использования.',
+      'Точная оценка движений пациентов на основе видео позволила нам глубже понять их состояние и адаптировать подход к лечению. Это сильный инструмент для любого реабилитационного центра, который стремится повысить эффективность своих программ и улучшить качество жизни пациентов',
   },
 ];
 
-export const Reviews = () => {
+type ReviewsProps = {};
+
+export const Reviews = forwardRef<HTMLDivElement, ReviewsProps>((_props, ref) => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -110,7 +117,7 @@ export const Reviews = () => {
   const settings = isMobile ? settingsSm : settingsBg;
 
   return (
-    <div className="reviews">
+    <div className="reviews" ref={ref}>
       <div className="reviews__nav-vertical">
         <div className="reviews__line"></div>
         <div className="reviews__circle "></div>
@@ -140,4 +147,4 @@ export const Reviews = () => {
       </div>
     </div>
   );
-};
+});

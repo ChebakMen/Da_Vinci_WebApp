@@ -6,18 +6,22 @@ import { Technologies } from '@/components/Technologies/technologies';
 
 import '../styles/homePage.scss';
 import Footer from '@/components/Footer/footer';
+import { useRef } from 'react';
 
 export const HomePage = () => {
+  const reviewsRef = useRef(null);
+  const funcRef = useRef(null);
+
   return (
     <>
-      <Header />
+      <Header reviewsRef={reviewsRef} funcRef={funcRef} />
       <main>
-        <About />
+        <About funcRef={funcRef} />
         <div className="homePage__navigate">
           <div className="homePage__components">
             <Technologies />
-            <Functional />
-            <Reviews />
+            <Functional ref={funcRef} />
+            <Reviews ref={reviewsRef} />
           </div>
         </div>
       </main>

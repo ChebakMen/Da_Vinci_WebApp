@@ -3,7 +3,16 @@ import '../../styles/about.scss';
 import Arrow from '/src/assets/img/Arrow.svg';
 import { Button } from '@heroui/button';
 
-export const About = () => {
+type AboutProps = {
+  funcRef: React.RefObject<HTMLDivElement>;
+};
+
+export const About: React.FC<AboutProps> = ({ funcRef }) => {
+  const scrollToBlock = () => {
+    if (funcRef.current) {
+      funcRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   return (
     <div className="about-us">
       <div className="about-us__container">
@@ -27,7 +36,11 @@ export const About = () => {
                 <div className="about-us__block__card about-us__block__card--2">Точность</div>
                 <div className="about-us__block__card about-us__block__card--3">Здоровье</div>
               </div>
-              <Button color="default" className="about-us__block__advantages--btn" variant="ghost">
+              <Button
+                color="default"
+                className="about-us__block__advantages--btn"
+                variant="ghost"
+                onClick={scrollToBlock}>
                 Попробовать
                 <img src={Arrow} alt="" />
               </Button>

@@ -38,6 +38,10 @@
       display: flex;
       justify-content: center;
       gap: 1.7vw;
+
+      @media (max-width: 400px) {
+        justify-content: start;
+      }
     }
 
     & > path {

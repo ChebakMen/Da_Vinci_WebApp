@@ -3,7 +3,23 @@ import '../../styles/header.scss';
 import { Button } from '@heroui/button';
 import { Link } from 'react-router-dom';
 
-export const Header = () => {
+type HeaderProps = {
+  funcRef: React.RefObject<HTMLDivElement>;
+  reviewsRef: React.RefObject<HTMLDivElement>;
+};
+
+export const Header: React.FC<HeaderProps> = ({ funcRef, reviewsRef }) => {
+  const scrollToReviews = () => {
+    if (reviewsRef.current) {
+      reviewsRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+  const scrollToFunc = () => {
+    if (funcRef.current) {
+      funcRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <header className="page-header">
       <div className="page-header__container container">
@@ -11,10 +27,18 @@ export const Header = () => {
           <Link to={'/'} className="page-header__logo">
             <div className="page-header__img"></div>
           </Link>
-          <Button color="default" className="page-header__btn" variant="ghost">
+          <Button
+            color="default"
+            className="page-header__btn"
+            variant="ghost"
+            onClick={scrollToReviews}>
             Отзывы
           </Button>
-          <Button color="default" className="page-header__btn page-header__btn--b" variant="ghost">
+          <Button
+            color="default"
+            className="page-header__btn page-header__btn--b"
+            variant="ghost"
+            onClick={scrollToFunc}>
             Начать
           </Button>
         </div>
