@@ -63,6 +63,7 @@ const Graphics: React.FC<GraphicsProps> = ({ keypoints }) => {
 
   const handleFrameClick = (keypoint: string) => {
     if (data) {
+      console.log('121212');
       const keypointCoordinates = processKeypointData(data, keypoint);
       setCoordinates(keypointCoordinates);
     }
@@ -121,7 +122,7 @@ const Graphics: React.FC<GraphicsProps> = ({ keypoints }) => {
     { key: 'right_wrist', label: 'Кисть на правой руке' },
     { key: 'left_wrist', label: 'Кисть на левой руке' },
     { key: 'right_ankle', label: 'Лодыжка на правой ноге' },
-    { key: 'left_ankle', label: 'Кисть на левой ноге' },
+    { key: 'left_ankle', label: 'Лодыжка на левой ноге' },
   ];
 
   return (
@@ -143,122 +144,122 @@ const Graphics: React.FC<GraphicsProps> = ({ keypoints }) => {
             <input
               type="radio"
               className="graphics__radio graphics__radio__nose"
-              id="keypoint-1"
+              id="nose"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_1')}
+              onClick={() => handleFrameClick('nose')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__shoulder-l"
-              id="keypoint-2"
+              id="left_shoulder"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_2')}
+              onClick={() => handleFrameClick('left_shoulder')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__shoulder-r"
-              id="keypoint-3"
+              id="right_shoulder"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_3')}
+              onClick={() => handleFrameClick('right_shoulder')}
             />
 
             <input
               type="radio"
               className="graphics__radio graphics__radio__elbow-l"
-              id="keypoint-4"
+              id="left_elbow"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_4')}
+              onClick={() => handleFrameClick('left_elbow')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__elbow-r"
-              id="keypoint-5"
+              id="right_elbow"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_5')}
+              onClick={() => handleFrameClick('right_elbow')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__brushes-l"
-              id="keypoint-6"
+              id="left_wrist"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_6')}
+              onClick={() => handleFrameClick('left_wrist')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__brushes-r"
-              id="keypoint-7"
+              id="right_wrist"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_7')}
+              onClick={() => handleFrameClick('right_wrist')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__eye-l"
-              id="keypoint-8"
+              id="left_eye"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_8')}
+              onClick={() => handleFrameClick('left_eye')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__eye-r"
-              id="keypoint-9"
+              id="right_eye"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_9')}
+              onClick={() => handleFrameClick('right_eye')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__ear-l"
-              id="keypoint-10"
+              id="left_ear"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_10')}
+              onClick={() => handleFrameClick('left_ear')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__ear-r"
-              id="keypoint-11"
+              id="right_ear"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_11')}
+              onClick={() => handleFrameClick('right_ear')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__hip-l"
-              id="keypoint-12"
+              id="left_hip"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_12')}
+              onClick={() => handleFrameClick('left_hip')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__hip-r"
-              id="keypoint-13"
+              id="right_hip"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_13')}
+              onClick={() => handleFrameClick('right_hip')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__knee-l"
-              id="keypoint-14"
+              id="left_knee"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_14')}
+              onClick={() => handleFrameClick('left_knee')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__knee-r"
-              id="keypoint-15"
+              id="right_knee"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_15')}
+              onClick={() => handleFrameClick('right_knee')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__foot-l"
-              id="keypoint-16"
+              id="left_ankle"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_16')}
+              onClick={() => handleFrameClick('left_ankle')}
             />
             <input
               type="radio"
               className="graphics__radio graphics__radio__foot-r"
-              id="keypoint-17"
+              id="right_ankle"
               name="keypoints"
-              onClick={() => handleFrameClick('keypoint_17')}
+              onClick={() => handleFrameClick('right_ankle')}
             />
           </div>
         </div>

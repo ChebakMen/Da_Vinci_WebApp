@@ -189,7 +189,12 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
               )}
             </TableBody>
           </Table>
-          <Modal size={'3xl'} backdrop="blur" isOpen={isOpen} onOpenChange={onOpenChange}>
+          <Modal
+            size={'3xl'}
+            backdrop="blur"
+            isOpen={isOpen}
+            scrollBehavior="inside"
+            onOpenChange={onOpenChange}>
             <ModalContent>
               {(onClose) => (
                 <>
@@ -232,7 +237,7 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
                       <p className="graphics__graphic__info"></p>
                     </div>
                   </ModalBody>
-                  <ModalFooter>
+                  <ModalFooter style={{ borderTop: '2px solid rgb(210, 210, 210)' }}>
                     <Button color="default" variant="light" onPress={onClose}>
                       Закрыть
                     </Button>
