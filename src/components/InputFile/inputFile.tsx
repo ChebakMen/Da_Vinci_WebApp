@@ -42,9 +42,15 @@ export const InputFile: React.FC<InputFileProps> = ({ onFileLoaded }) => {
     }
   };
 
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (e.target.files) {
+  //     setStatus('initial');
+  //     setFile(e.target.files[0]);
+  //   }
+  // };
+  // Обработчик выбора файла
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setStatus('initial');
+    if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
     }
   };
@@ -63,20 +69,34 @@ export const InputFile: React.FC<InputFileProps> = ({ onFileLoaded }) => {
       setStatus('uploading');
 
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('video', file);
+      formData.append('type', 'auto');
+      formData.append('save_video', 'true');
       console.log('file', file);
 
       try {
-        // const result = await fetch('http://127.0.0.1:8000/api/keypoints/', {
+        // const result = await fetch('https://back-api-1-1x9p.onrender.com/api/keypoints', {
         //   method: 'POST',
         //   body: formData,
         // });
+        // console.log(result);
+        // const result = await fetch('https://03aeedf19961.ngrok-free.app/analyze', {
+        //   method: 'POST',
+        //   body: formData,
+        // });
+        // console.log(result);
 
         // const result = await fetch('http://127.0.0.1:8000/api/', {
         //   method: 'GET',
         // });
 
-        const result = await fetch('https://mocki.io/v1/05cca9d5-8014-4841-94ab-f899d2cf2af9', {
+        // Старый без параметров
+        // const result = await fetch('https://mocki.io/v1/05cca9d5-8014-4841-94ab-f899d2cf2af9', {
+        //   method: 'GET',
+        // });
+
+        // Весь файл
+        const result = await fetch('https://mocki.io/v1/3279e0b8-66ff-44a5-a73a-5270d0379909', {
           method: 'GET',
         });
 
@@ -97,7 +117,40 @@ export const InputFile: React.FC<InputFileProps> = ({ onFileLoaded }) => {
       }
     }
   };
+  // const handleUpload = async () => {
+  //   if (!file) {
+  //     alert('Пожалуйста, выберите файл для загрузки.');
+  //     return;
+  //   }
 
+  //   setStatus('uploading');
+
+  //   const formData = new FormData();
+  //   formData.append('file', file);
+  //   console.log('file', file);
+
+  //   try {
+  //     const response = await fetch('https://back-api-c3ns.onrender.com/api/keypoints', {
+  //       method: 'POST',
+  //       body: formData,
+  //     });
+
+  //     // Проверка успешности ответа
+  //     if (!response.ok) {
+  //       throw new Error(`Ошибка: ${response.status}`);
+  //     }
+
+  //     const data = await response.json();
+
+  //     console.log(data);
+  //     setStatus('success');
+  //     onFileLoaded(data);
+  //     console.log('Ответ сервера:', data);
+  //   } catch (error) {
+  //     console.error('Ошибка загрузки файла:', error);
+  //     setStatus('fail');
+  //   }
+  // };
   const isSmallScreen = useMediaQuery('(max-width:500px)');
 
   return (

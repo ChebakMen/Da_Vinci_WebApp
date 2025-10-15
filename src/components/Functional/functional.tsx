@@ -4,7 +4,6 @@ import { Tabs, Tab } from '@heroui/tabs';
 import InputFile from '../InputFile/inputFile';
 import Graphics from '../Graphics/graphics';
 import { Parametrs } from '../Parametrs/parametrs';
-// import { Parametrs } from '../Parametrs/Parametrs';
 
 type KeypointData = {
   [key: string]: {
@@ -23,10 +22,30 @@ export const Functional = forwardRef<HTMLDivElement, FuncProps>((_props, ref) =>
   const [keypoints, setKeypoints] = useState<KeypointData>([]);
 
   // Функция для обработки загруженного файла
-  const handleFileLoaded = (newKeypoints: KeypointData) => {
+  // const handleFileLoaded = (newKeypoints: KeypointData) => {
+  //   setFileLoaded(true);
+  //   console.log('newKeypoints', newKeypoints);
+  //   setKeypoints(newKeypoints); // Обновляем keypoints
+
+  // };
+  const handleFileLoaded = (data: {
+    frames: { frame: number; keypoints: Record<string, { x: number; y: number }> }[];
+  }) => {
     setFileLoaded(true);
-    console.log('newKeypoints', newKeypoints);
-    setKeypoints(newKeypoints); // Обновляем keypoints
+
+    // Преобразуем входные данные frames в массив
+    const transformedKeypoints = data.frames.map((frameObj) => {
+      const pointsArray = Object.entries(frameObj.keypoints).map(([keypoint, pos]) => ({
+        keypoint,
+        position: { x: pos.x, y: pos.y },
+      }));
+      return {
+        [frameObj.frame]: pointsArray,
+      };
+    });
+
+    console.log('transformedKeypoints', transformedKeypoints);
+    setKeypoints(transformedKeypoints);
   };
 
   return (

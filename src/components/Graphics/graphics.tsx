@@ -24,10 +24,8 @@ type KeypointCoordinates = KeypointCoordinate[];
 
 const processKeypointData = (data: KeypointData, keypoint: string): KeypointCoordinates => {
   const keypointCoordinates: KeypointCoordinates = [];
-
   data.forEach((frameData) => {
     const frame = Object.keys(frameData)[0];
-
     frameData[frame].forEach((item) => {
       if (item.keypoint === keypoint) {
         keypointCoordinates.push({
@@ -51,7 +49,7 @@ const Graphics: React.FC<GraphicsProps> = ({ keypoints }) => {
   const [data, setData] = useState<KeypointData | null>(null);
   const [coordinates, setCoordinates] = useState<KeypointCoordinates>([]);
   const [value, setValue] = React.useState<number[]>([0, 25]);
-  const [selectedOption, setSelectedOption] = useState<Set<Key>>(new Set(['keypoint_1']));
+  const [selectedOption, setSelectedOption] = useState<Set<Key>>(new Set(['nose']));
   const minDistance = 10;
 
   useEffect(() => {
@@ -59,7 +57,7 @@ const Graphics: React.FC<GraphicsProps> = ({ keypoints }) => {
   }, [keypoints]);
   useEffect(() => {
     if (data) {
-      handleFrameClick('keypoint_1');
+      handleFrameClick('nose');
     }
   }, [data]);
 
@@ -107,20 +105,23 @@ const Graphics: React.FC<GraphicsProps> = ({ keypoints }) => {
   }, [selectedOption]);
 
   const keypointsOption = [
-    { key: 'keypoint_1', label: 'Нос' },
-    { key: 'keypoint_2', label: 'Правое плечо' },
-    { key: 'keypoint_3', label: 'Левое плечо' },
-    { key: 'keypoint_4', label: 'Левый глаз' },
-    { key: 'keypoint_5', label: 'Правый глаз' },
-    { key: 'keypoint_6', label: 'Правое ухо' },
-    { key: 'keypoint_7', label: 'Левое ухо' },
-    { key: 'keypoint_8', label: 'Таз' },
-    { key: 'keypoint_9', label: 'Левое колено' },
-    { key: 'keypoint_10', label: 'Правое колено' },
-    { key: 'keypoint_11', label: 'Локоть на правой руке' },
-    { key: 'keypoint_12', label: 'Локоть на левой руке' },
-    { key: 'keypoint_13', label: 'Кисть на правой руке' },
-    { key: 'keypoint_14', label: 'Кисть на левой руке' },
+    { key: 'nose', label: 'Нос' },
+    { key: 'right_shoulder', label: 'Правое плечо' },
+    { key: 'left_shoulder', label: 'Левое плечо' },
+    { key: 'left_eye', label: 'Левый глаз' },
+    { key: 'right_eye', label: 'Правый глаз' },
+    { key: 'right_ear', label: 'Правое ухо' },
+    { key: 'left_ear', label: 'Левое ухо' },
+    { key: 'right_hip', label: 'Таз правый бок' },
+    { key: 'left_hip', label: 'Таз левый бок' },
+    { key: 'left_knee', label: 'Левое колено' },
+    { key: 'right_knee', label: 'Правое колено' },
+    { key: 'right_elbow', label: 'Локоть на правой руке' },
+    { key: 'left_elbow', label: 'Локоть на левой руке' },
+    { key: 'right_wrist', label: 'Кисть на правой руке' },
+    { key: 'left_wrist', label: 'Кисть на левой руке' },
+    { key: 'right_ankle', label: 'Лодыжка на правой ноге' },
+    { key: 'left_ankle', label: 'Кисть на левой ноге' },
   ];
 
   return (
