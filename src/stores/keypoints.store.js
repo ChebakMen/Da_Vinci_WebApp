@@ -4,7 +4,7 @@ import axios from 'axios';
 class KeypointsStore {
   keypoints = [];
 
-  constructor(parameters) {
+  constructor() {
     makeAutoObservable(this);
   }
 

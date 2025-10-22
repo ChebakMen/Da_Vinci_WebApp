@@ -4,6 +4,8 @@ import { LineChart } from '@mui/x-charts/LineChart';
 import Slider from '@mui/material/Slider';
 import { Select, SelectItem } from '@heroui/select';
 import type { SharedSelection } from '@heroui/react';
+import functionalDataStore from '../../stores/functionalData.store';
+
 type KeypointData = {
   [key: string]: {
     keypoint: string;
@@ -44,17 +46,19 @@ interface GraphicsProps {
   keypoints: KeypointData;
 }
 
-const Graphics: React.FC<GraphicsProps> = ({ keypoints }) => {
+const Graphics = () => {
   type Key = string | number;
   const [data, setData] = useState<KeypointData | null>(null);
   const [coordinates, setCoordinates] = useState<KeypointCoordinates>([]);
   const [value, setValue] = React.useState<number[]>([0, 25]);
   const [selectedOption, setSelectedOption] = useState<Set<Key>>(new Set(['nose']));
   const minDistance = 10;
+  const keypoints = functionalDataStore.keypoints;
 
   useEffect(() => {
     setData(keypoints);
   }, [keypoints]);
+
   useEffect(() => {
     if (data) {
       handleFrameClick('nose');
@@ -63,7 +67,6 @@ const Graphics: React.FC<GraphicsProps> = ({ keypoints }) => {
 
   const handleFrameClick = (keypoint: string) => {
     if (data) {
-      console.log('121212');
       const keypointCoordinates = processKeypointData(data, keypoint);
       setCoordinates(keypointCoordinates);
     }

@@ -19,6 +19,10 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Tabs,
+  Tab,
+  SelectItem,
+  Select,
 } from '@heroui/react';
 import { Header } from '../Header/header';
 import Footer from '../Footer/footer';
@@ -90,6 +94,8 @@ interface ModalDataType {
   description: string;
   date: string;
   id: string;
+  video: string;
+  result: string;
 }
 
 export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
@@ -122,6 +128,8 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
       description: action.description,
       date: action.timestamp.toLocaleString(),
       id: action.id,
+      video: action.id,
+      result: action.id,
     });
     onOpen();
   };
@@ -143,6 +151,26 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
       setValue(newValue as number[]);
     }
   };
+
+  const keypointsOption = [
+    { key: 'nose', label: 'Нос' },
+    { key: 'right_shoulder', label: 'Правое плечо' },
+    { key: 'left_shoulder', label: 'Левое плечо' },
+    { key: 'left_eye', label: 'Левый глаз' },
+    { key: 'right_eye', label: 'Правый глаз' },
+    { key: 'right_ear', label: 'Правое ухо' },
+    { key: 'left_ear', label: 'Левое ухо' },
+    { key: 'right_hip', label: 'Таз правый бок' },
+    { key: 'left_hip', label: 'Таз левый бок' },
+    { key: 'left_knee', label: 'Левое колено' },
+    { key: 'right_knee', label: 'Правое колено' },
+    { key: 'right_elbow', label: 'Локоть на правой руке' },
+    { key: 'left_elbow', label: 'Локоть на левой руке' },
+    { key: 'right_wrist', label: 'Кисть на правой руке' },
+    { key: 'left_wrist', label: 'Кисть на левой руке' },
+    { key: 'right_ankle', label: 'Лодыжка на правой ноге' },
+    { key: 'left_ankle', label: 'Лодыжка на левой ноге' },
+  ];
 
   return (
     <div>
@@ -190,51 +218,82 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
             </TableBody>
           </Table>
           <Modal
-            size={'3xl'}
+            size={'2xl'}
             backdrop="blur"
             isOpen={isOpen}
             scrollBehavior="inside"
+            style={{ marginTop: '150px' }}
             onOpenChange={onOpenChange}>
             <ModalContent>
               {(onClose) => (
                 <>
-                  <ModalHeader className="account__modal-title ">Подробное описание</ModalHeader>
+                  <ModalHeader
+                    className="account__modal-title "
+                    style={{ borderBottom: '2px solid rgb(210, 210, 210)' }}>
+                    {modalData?.date}
+                  </ModalHeader>
                   <ModalBody>
-                    <div className="">{modalData?.description}</div>
-                    <div className="graphics__graphic">
-                      <LineChart
-                        xAxis={[
-                          {
-                            label: 'Координаты точек',
-                            data: coordinates.map((_point, index) => index + 1) || [],
-                            min: value[0],
-                            max: value[1],
-                          },
-                        ]}
-                        yAxis={[
-                          {
-                            label: 'Ось X',
-                          },
-                        ]}
-                        series={[
-                          {
-                            data: coordinates.map((point) => point.x) || [],
-                            color: 'black',
-                          },
-                        ]}
-                        className="account__graphic"
-                        grid={{ vertical: true, horizontal: true }}
-                      />
-                      <Slider
-                        value={value}
-                        onChange={handleChange}
-                        valueLabelDisplay="auto"
-                        min={0}
-                        max={240}
-                        className="account__graphic_slider"
-                      />
+                    <div className="account__modal-description ">
+                      Описание: {modalData?.description}
+                    </div>
+                    <div className="account__modal-description ">
+                      Прикрепленное видео: {modalData?.video}
+                    </div>
+                    <div className="account__tabs_wrapper">
+                      <Select
+                        className="max-w-xs  account__select-kp"
+                        size="sm"
+                        label="Выберите часть тела"
+                        selectionMode="single">
+                        {/* {keypointsOption.map((kp) => (
+                              <SelectItem key={kp.key}>{kp.label}</SelectItem>
+                            ))} */}
 
-                      <p className="graphics__graphic__info"></p>
+                        <SelectItem key={1}>Нос</SelectItem>
+                        <SelectItem key={2}>Правый локоть</SelectItem>
+                      </Select>
+                      <Tabs aria-label="Options" className="">
+                        <Tab key="graphics" title="Графики">
+                          <div className="">
+                            <h2 className="account__modal-graphic-title">График</h2>
+
+                            <div className="account__graphic">
+                              <LineChart
+                                xAxis={[
+                                  {
+                                    label: 'Координаты точек',
+                                    data: coordinates.map((_point, index) => index + 1) || [],
+                                    min: value[0],
+                                    max: value[1],
+                                  },
+                                ]}
+                                yAxis={[
+                                  {
+                                    label: 'Ось X',
+                                  },
+                                ]}
+                                series={[
+                                  {
+                                    data: coordinates.map((point) => point.x) || [],
+                                    color: 'black',
+                                  },
+                                ]}
+                                className="account__graphic"
+                                grid={{ vertical: true, horizontal: true }}
+                              />
+                              <Slider
+                                value={value}
+                                onChange={handleChange}
+                                valueLabelDisplay="auto"
+                                min={0}
+                                max={240}
+                                className="account__graphic_slider"
+                              />
+                            </div>
+                          </div>
+                        </Tab>
+                        <Tab key="parametrs" title="Параметры"></Tab>
+                      </Tabs>
                     </div>
                   </ModalBody>
                   <ModalFooter style={{ borderTop: '2px solid rgb(210, 210, 210)' }}>

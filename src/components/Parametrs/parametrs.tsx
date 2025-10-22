@@ -6,10 +6,9 @@ import { Button } from '@heroui/button';
 import { Select, SelectItem } from '@heroui/select';
 import type { SharedSelection } from '@heroui/react';
 
-type KeypointData = {
-  params_1: ParamsData;
-  params_2: ParamsData;
-};
+import functionalDataStore from '../../stores/functionalData.store';
+
+type KeypointData = ParamsData[];
 
 type ParamsData = {
   leg_length_difference: number;
@@ -31,23 +30,6 @@ type KeypointCoordinate = {
 };
 
 type KeypointCoordinates = KeypointCoordinate[];
-
-const fetchDataAndProcess = async () => {
-  try {
-    const response = await fetch('https://mocki.io/v1/b2146206-0c25-4636-a54e-1f26e27b3e54');
-
-    if (!response.ok) {
-      throw new Error(`Ошибка запроса: ${response.status}`);
-    }
-
-    const data: KeypointData = await response.json();
-    console.log(data);
-    return data;
-  } catch (error) {
-    console.error('Ошибка при получении данных:', error);
-    return null;
-  }
-};
 
 const processKeypointData = (
   data: KeypointData,
@@ -83,10 +65,16 @@ export const Parametrs = () => {
   );
   const minDistance = 10;
 
+  const parameters = functionalDataStore.parameters;
+
   useEffect(() => {
-    fetchDataAndProcess().then((result) => setData(result));
+    if (parameters && parameters.length > 0) {
+      setData(parameters as KeypointData);
+    } else {
+      setData(null);
+    }
     console.log(data);
-  }, []);
+  }, [parameters]);
 
   useEffect(() => {
     if (data) {
@@ -95,7 +83,7 @@ export const Parametrs = () => {
   }, [data]);
 
   const handleFrameClick = (paramKey: keyof ParamsData) => {
-    if (data) {
+    if (data && data.length > 0) {
       const keypointCoordinates = processKeypointData(data, paramKey);
       setCoordinates(keypointCoordinates);
     }
