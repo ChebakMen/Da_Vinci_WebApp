@@ -61,26 +61,28 @@ export const Header: React.FC<HeaderProps> = ({ funcRef, reviewsRef }) => {
         <NavbarBrand>
           <Link className="page-header__img" to="/"></Link>
         </NavbarBrand>
-
-        <NavbarItem>
-          <Button
-            color="default"
-            className="page-header__btn"
-            variant="ghost"
-            onClick={scrollToReviews}>
-            Отзывы
-          </Button>
-        </NavbarItem>
-        <NavbarItem>
-          <Button
-            color="default"
-            className="page-header__btn page-header__btn--b"
-            variant="ghost"
-            onClick={scrollToFunc}>
-            Начать
-          </Button>
-        </NavbarItem>
-        <NavbarItem></NavbarItem>
+        {isHomePage && (
+          <>
+            <NavbarItem>
+              <Button
+                color="default"
+                className="page-header__btn"
+                variant="ghost"
+                onClick={scrollToReviews}>
+                Отзывы
+              </Button>
+            </NavbarItem>
+            <NavbarItem>
+              <Button
+                color="default"
+                className="page-header__btn page-header__btn--b"
+                variant="ghost"
+                onClick={scrollToFunc}>
+                Начать
+              </Button>
+            </NavbarItem>
+          </>
+        )}
       </NavbarContent>
 
       {isHomePage && (

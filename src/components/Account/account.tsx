@@ -1,6 +1,6 @@
 import '../../styles/account.scss';
 import { useLocation } from 'react-router-dom';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
 import Slider from '@mui/material/Slider';
 import {
@@ -23,9 +23,11 @@ import {
   Tab,
   SelectItem,
   Select,
+  SharedSelection,
 } from '@heroui/react';
 import { Header } from '../Header/header';
 import Footer from '../Footer/footer';
+import functionalDataStore from '@/stores/functionalData.store';
 
 // types.ts
 export interface User {
@@ -50,14 +52,6 @@ interface UserProfileProps {
 
 const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
   const [editableUser, _setEditableUser] = useState<User>(user);
-
-  // const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = e.target;
-  //   setEditableUser((prev) => ({
-  //     ...prev,
-  //     [name]: name === 'age' ? Number(value) : value,
-  //   }));
-  // };
 
   return (
     <div className="account_user-data">
@@ -87,8 +81,6 @@ type KeypointCoordinate = {
   y: number;
 };
 
-type KeypointCoordinates = KeypointCoordinate[];
-
 interface ModalDataType {
   title: string;
   description: string;
@@ -98,7 +90,121 @@ interface ModalDataType {
   result: string;
 }
 
+type KeypointData = {
+  [key: string]: {
+    keypoint: string;
+    position: {
+      x: number;
+      y: number;
+    };
+  }[];
+}[];
+
+type ParamsData = {
+  leg_length_difference: number;
+  shoulder_height_difference: number;
+  pelvis_tilt: number;
+  knee_valgus_varus: number[];
+  step_width: number;
+  step_asymmetry: number;
+  pelvis_rotation: number;
+  shoulder_rotation: number;
+  center_of_gravity_deviation: number;
+  arm_movement_symmetry: number;
+  step_count: number;
+}[];
+
+type KeypointCoordinates = KeypointCoordinate[];
+
+const processKeypointData = (data: KeypointData, keypoint: string): KeypointCoordinates => {
+  const keypointCoordinates: KeypointCoordinates = [];
+
+  try {
+    // Преобразуем MobX Proxy в обычный объект
+    const plainData = JSON.parse(JSON.stringify(data));
+
+    // Проверяем, что данные являются массивом
+    if (!Array.isArray(plainData)) {
+      console.error('Expected data to be an array, got:', typeof plainData);
+      return keypointCoordinates;
+    }
+
+    // Обрабатываем каждый кадр
+    for (const frameData of plainData) {
+      if (!frameData || typeof frameData !== 'object') {
+        continue;
+      }
+
+      const frameKeys = Object.keys(frameData);
+      if (frameKeys.length === 0) {
+        continue;
+      }
+
+      const frame = frameKeys[0];
+      const items = frameData[frame];
+
+      // Проверяем, что items является массивом
+      if (!Array.isArray(items)) {
+        console.warn(`Items for frame ${frame} is not an array:`, items);
+        continue;
+      }
+
+      // Обрабатываем каждый элемент в кадре
+      for (const item of items) {
+        if (item && item.keypoint === keypoint && item.position) {
+          keypointCoordinates.push({
+            frame: frame,
+            x: item.position.x || 0,
+            y: item.position.y || 0,
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error processing keypoint data:', error);
+  }
+
+  return keypointCoordinates;
+};
+
+const processParameterData = (data: ParamsData, parameter: string): KeypointCoordinates => {
+  const parameterValues: KeypointCoordinates = [];
+
+  data.forEach((paramSet, index) => {
+    const value = paramSet[parameter as keyof typeof paramSet];
+
+    if (Array.isArray(value)) {
+      // Если параметр является массивом (например, knee_valgus_varus)
+      value.forEach((val, arrayIndex) => {
+        parameterValues.push({
+          frame: `${index}_${arrayIndex}`,
+          x: arrayIndex + 1,
+          y: val,
+        });
+      });
+    } else if (typeof value === 'number') {
+      // Если параметр - просто число
+      parameterValues.push({
+        frame: `${index}`,
+        x: index + 1,
+        y: value,
+      });
+    }
+  });
+
+  return parameterValues;
+};
+
 export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
+  type Key = string | number;
+  const keypoints = functionalDataStore.keypoints;
+  const parameters = functionalDataStore.parameters;
+
+  const [data, setData] = useState<KeypointData | ParamsData | null>(null);
+  const [coordinates, setCoordinates] = useState<KeypointCoordinates>([]);
+  const [activeTab, setActiveTab] = useState<string>('graphics');
+  const [selectedOption, setSelectedOption] = useState<Set<Key>>(new Set(['nose']));
+
   const columns = [
     { key: 'timestamp', label: 'Дата действия' },
     { key: 'description', label: 'Описание' },
@@ -116,19 +222,73 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
   };
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [coordinates, _setCoordinates] = useState<KeypointCoordinates>([]);
   const [value, setValue] = React.useState<number[]>([0, 25]);
   const [modalData, setModalData] = useState<ModalDataType | null>(null);
 
   const minDistance = 10;
 
+  // Сбрасываем выбранное значение при переключении табов
+  const handleTabChange = (key: string) => {
+    setActiveTab(key);
+    if (key === 'graphics') {
+      setSelectedOption(new Set(['nose']));
+    } else if (key === 'parametrs') {
+      setSelectedOption(new Set(['leg_length_difference']));
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'graphics') {
+      setData(null);
+      setData(keypoints);
+    } else if (activeTab === 'parametrs') {
+      setData(parameters as ParamsData);
+    }
+  }, [activeTab, keypoints, parameters]);
+
+  const handleSelectionChange = (keys: SharedSelection) => {
+    if (typeof keys === 'string') {
+      setSelectedOption(new Set([keys]));
+    } else {
+      const stringKeys = new Set(Array.from(keys).map((k) => k.toString()));
+      setSelectedOption(stringKeys);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedOption.size > 0 && data) {
+      const selectedKey = Array.from(selectedOption)[0];
+      if (typeof selectedKey === 'string') {
+        if (activeTab === 'graphics') {
+          handleKeypointClick(selectedKey);
+        } else if (activeTab === 'parametrs') {
+          handleParameterClick(selectedKey);
+        }
+      }
+    }
+  }, [selectedOption, data, activeTab]);
+
+  const handleKeypointClick = (keypoint: string) => {
+    if (data && activeTab === 'graphics') {
+      const keypointCoordinates = processKeypointData(data as KeypointData, keypoint);
+      setCoordinates(keypointCoordinates);
+    }
+  };
+
+  const handleParameterClick = (parameter: string) => {
+    if (data && activeTab === 'parametrs') {
+      const parameterValues = processParameterData(data as ParamsData, parameter);
+      setCoordinates(parameterValues);
+    }
+  };
+
   const handleOpenModal = (action: Action) => {
     setModalData({
-      title: 'Заголовок по умолчанию или извлечь из action',
+      title: 'Заголовок',
       description: action.description,
       date: action.timestamp.toLocaleString(),
       id: action.id,
-      video: action.id,
+      video: 'video_123321.mp4',
       result: action.id,
     });
     onOpen();
@@ -171,6 +331,42 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
     { key: 'right_ankle', label: 'Лодыжка на правой ноге' },
     { key: 'left_ankle', label: 'Лодыжка на левой ноге' },
   ];
+
+  const parametrsOption = [
+    { key: 'leg_length_difference', label: 'Разница в длинне ног' },
+    { key: 'shoulder_height_difference', label: 'Разница в высоте плеч' },
+    { key: 'pelvis_tilt', label: 'Наклон таза' },
+    { key: 'knee_valgus_varus', label: 'Вальгус колен' },
+    { key: 'step_width', label: 'Ширина шага' },
+    { key: 'step_asymmetry', label: 'Асиметрия шага' },
+    { key: 'pelvis_rotation', label: 'Вращение таза' },
+    { key: 'shoulder_rotation', label: 'Вращение плеча' },
+    { key: 'center_of_gravity_deviation', label: 'Отклонение центра тяжести ' },
+    { key: 'arm_movement_symmetry', label: 'Симметрия движения рук' },
+    { key: 'step_count', label: 'Количество шагов' },
+  ];
+
+  const getCurrentOptions = () => {
+    return activeTab === 'graphics' ? keypointsOption : parametrsOption;
+  };
+
+  const getSelectLabel = () => {
+    return activeTab === 'graphics' ? 'Выберите часть тела' : 'Выберите параметр';
+  };
+
+  // Проверяем, что выбранное значение существует в текущих опциях
+  const getSafeSelectedKeys = () => {
+    const currentOptions = getCurrentOptions();
+    const selectedKey = Array.from(selectedOption)[0];
+
+    // Если выбранный ключ существует в текущих опциях, используем его
+    if (currentOptions.some((option) => option.key === selectedKey)) {
+      return selectedOption;
+    }
+
+    // Иначе используем первый доступный вариант
+    return new Set([currentOptions[0]?.key || '']);
+  };
 
   return (
     <div>
@@ -236,32 +432,36 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
                     <div className="account__modal-description ">
                       Описание: {modalData?.description}
                     </div>
-                    <div className="account__modal-description ">
+                    <div className="account__modal-description account__modal-description--fz16 ">
                       Прикрепленное видео: {modalData?.video}
                     </div>
                     <div className="account__tabs_wrapper">
-                      <Select
-                        className="max-w-xs  account__select-kp"
-                        size="sm"
-                        label="Выберите часть тела"
-                        selectionMode="single">
-                        {/* {keypointsOption.map((kp) => (
-                              <SelectItem key={kp.key}>{kp.label}</SelectItem>
-                            ))} */}
-
-                        <SelectItem key={1}>Нос</SelectItem>
-                        <SelectItem key={2}>Правый локоть</SelectItem>
-                      </Select>
-                      <Tabs aria-label="Options" className="">
+                      <Tabs
+                        aria-label="Dynamic tabs"
+                        className=""
+                        selectedKey={activeTab}
+                        onSelectionChange={(key) => handleTabChange(key as string)}>
                         <Tab key="graphics" title="Графики">
-                          <div className="">
+                          <div className="account__tab-content">
+                            <Select
+                              className="max-w-xs account__select-kp"
+                              size="sm"
+                              selectedKeys={getSafeSelectedKeys()}
+                              onSelectionChange={handleSelectionChange}
+                              label={getSelectLabel()}
+                              aria-label={getSelectLabel()}
+                              selectionMode="single">
+                              {getCurrentOptions().map((kp) => (
+                                <SelectItem key={kp.key}>{kp.label}</SelectItem>
+                              ))}
+                            </Select>
                             <h2 className="account__modal-graphic-title">График</h2>
 
                             <div className="account__graphic">
                               <LineChart
                                 xAxis={[
                                   {
-                                    label: 'Координаты точек',
+                                    label: activeTab === 'graphics' ? 'Координата по X' : 'Кадры',
                                     data: coordinates.map((_point, index) => index + 1) || [],
                                     min: value[0],
                                     max: value[1],
@@ -269,12 +469,13 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
                                 ]}
                                 yAxis={[
                                   {
-                                    label: 'Ось X',
+                                    label:
+                                      activeTab === 'graphics' ? 'Координата по Y' : 'Значения',
                                   },
                                 ]}
                                 series={[
                                   {
-                                    data: coordinates.map((point) => point.x) || [],
+                                    data: coordinates.map((point) => point.y) || [],
                                     color: 'black',
                                   },
                                 ]}
@@ -292,7 +493,56 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
                             </div>
                           </div>
                         </Tab>
-                        <Tab key="parametrs" title="Параметры"></Tab>
+                        <Tab key="parametrs" title="Параметры">
+                          <div className="account__tab-content">
+                            <Select
+                              className="max-w-xs account__select-kp"
+                              size="sm"
+                              selectedKeys={getSafeSelectedKeys()}
+                              onSelectionChange={handleSelectionChange}
+                              label={getSelectLabel()}
+                              selectionMode="single">
+                              {getCurrentOptions().map((kp) => (
+                                <SelectItem key={kp.key}>{kp.label}</SelectItem>
+                              ))}
+                            </Select>
+                            <h2 className="account__modal-graphic-title">График</h2>
+
+                            <div className="account__graphic">
+                              <LineChart
+                                xAxis={[
+                                  {
+                                    label: activeTab === 'graphics' ? 'Кадры' : 'Измерения',
+                                    data: coordinates.map((_point, index) => index + 1) || [],
+                                    min: value[0],
+                                    max: value[1],
+                                  },
+                                ]}
+                                yAxis={[
+                                  {
+                                    label: activeTab === 'graphics' ? 'Координаты' : 'Значения',
+                                  },
+                                ]}
+                                series={[
+                                  {
+                                    data: coordinates.map((point) => point.y) || [],
+                                    color: 'black',
+                                  },
+                                ]}
+                                className="account__graphic"
+                                grid={{ vertical: true, horizontal: true }}
+                              />
+                              <Slider
+                                value={value}
+                                onChange={handleChange}
+                                valueLabelDisplay="auto"
+                                min={0}
+                                max={240}
+                                className="account__graphic_slider"
+                              />
+                            </div>
+                          </div>
+                        </Tab>
                       </Tabs>
                     </div>
                   </ModalBody>
@@ -317,6 +567,7 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
 export const Account = () => {
   const location = useLocation();
   let user = location.state?.user;
+
   const [editableUser, _setEditableUser] = useState<User>(user);
 
   const renderRole = () => {
@@ -325,11 +576,6 @@ export const Account = () => {
     } else return 'пациента';
   };
 
-  console.log(user);
-
-  // const [actions, setActions] = useState<Action[]>([]);
-
-  //убрать потом
   const reviewsRef = useRef(null);
   const funcRef = useRef(null);
 

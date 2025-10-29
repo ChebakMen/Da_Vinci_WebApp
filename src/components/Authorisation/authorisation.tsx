@@ -39,13 +39,13 @@ export const Authorisation = () => {
               {
                 id: '1',
                 timestamp: new Date(),
-                description: 'Первичная оценка позвоносника Захиров И.А.',
+                description: 'Первичная оценка позвоночника Захиров И.А.',
                 pdfUrl: 'https://example.com/action1.pdf',
               },
               {
                 id: '2',
                 timestamp: new Date(),
-                description: 'Первичная оценка позвоносника Захиров И.А.',
+                description: 'Первичная оценка шейного отдела Захиров И.А.',
                 pdfUrl: 'https://example.com/action1.pdf',
               },
             ],

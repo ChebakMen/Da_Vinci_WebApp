@@ -42,10 +42,6 @@ const processKeypointData = (data: KeypointData, keypoint: string): KeypointCoor
   return keypointCoordinates;
 };
 
-interface GraphicsProps {
-  keypoints: KeypointData;
-}
-
 const Graphics = () => {
   type Key = string | number;
   const [data, setData] = useState<KeypointData | null>(null);
