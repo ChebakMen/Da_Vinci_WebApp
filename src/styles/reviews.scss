@@ -119,13 +119,17 @@
       backdrop-filter: blur(4px);
       margin-bottom: 10px;
       &-img {
-        height: 150px;
         width: 100%;
+        object-fit: cover;
+        height: auto;
+        max-height: 150px;
         border-radius: 16px;
         margin-bottom: 15px;
+        filter: blur(0.6px);
 
         @media (max-width: 400px) {
-          height: 120px;
+          max-height: 120px;
+          filter: none;
         }
       }
 

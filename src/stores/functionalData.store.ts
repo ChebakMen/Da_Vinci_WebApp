@@ -1,5 +1,4 @@
 import { makeAutoObservable, action, runInAction } from 'mobx';
-import axios from 'axios';
 
 class FunctionalDataStore {
   keypoints: any[]= [];

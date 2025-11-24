@@ -8,7 +8,7 @@
   &__container {
     margin: 0 auto;
     width: 1100px;
-    padding: 25px 0;
+    padding: 25px 40px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -19,6 +19,10 @@
     }
     @media (max-width: 700px) {
       flex-wrap: wrap;
+    }
+    @media (max-width: 400px) {
+      padding: 25px 20px;
+      margin: 0;
     }
   }
 
@@ -31,13 +35,14 @@
 
   &__social {
     fill: none;
+    width: 300px;
     stroke: rgb(35, 35, 35);
     transition: stroke 0.3s;
 
     &-items {
       display: flex;
-      justify-content: center;
-      gap: 1.7vw;
+      justify-content: start;
+      gap: 1.5vw;
 
       @media (max-width: 400px) {
         justify-content: start;
@@ -69,13 +74,19 @@
   }
   &__connection {
     text-decoration: none;
+    font-family: 'Rubik';
     color: black;
     margin-bottom: 5px;
     transition: color 0.3s;
-    font-weight: 450;
+    font-weight: 400;
 
     &:hover {
       color: #808080;
+    }
+    @media (max-width: 400px) {
+      &:last-of-type {
+        margin-bottom: 20px;
+      }
     }
   }
 }

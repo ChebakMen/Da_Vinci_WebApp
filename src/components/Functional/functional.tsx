@@ -34,7 +34,7 @@ type FuncProps = {};
 
 export const Functional = forwardRef<HTMLDivElement, FuncProps>((_props, ref) => {
   const [fileLoaded, setFileLoaded] = useState(false);
-  const [keypoints, setKeypoints] = useState<KeypointData>([]);
+  const [_keypoints, setKeypoints] = useState<KeypointData>([]);
 
   // Функция для обработки загруженного файла
   // const handleFileLoaded = (newKeypoints: KeypointData) => {

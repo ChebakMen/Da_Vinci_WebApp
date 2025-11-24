@@ -1,5 +1,4 @@
 import '../../styles/account.scss';
-import { useLocation } from 'react-router-dom';
 import React, { useState, useRef, useEffect } from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
 import Slider from '@mui/material/Slider';
@@ -23,50 +22,128 @@ import {
   Tab,
   SelectItem,
   Select,
-  SharedSelection,
 } from '@heroui/react';
 import { Header } from '../Header/header';
 import Footer from '../Footer/footer';
 import functionalDataStore from '@/stores/functionalData.store';
+import userStore from '../../stores/user';
+import { IUser } from '../../models/IUser';
+import { Action } from '../../models/HistoryAction';
 
 // types.ts
-export interface User {
-  id: number;
-  fio: string;
-  phone: string;
-  history: [];
-  roll: string;
-  email: string;
-}
-
-interface Action {
-  id: string;
-  timestamp: Date;
-  description: string;
-  pdfUrl: string;
-}
 
 interface UserProfileProps {
-  user: User;
+  user: IUser;
+  onUserUpdate?: (updatedUser: IUser) => void;
 }
 
-const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
-  const [editableUser, _setEditableUser] = useState<User>(user);
+const UserProfile: React.FC<UserProfileProps> = ({ user, onUserUpdate }) => {
+  const [editableUser, setEditableUser] = useState<IUser>(user);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [originalUser, setOriginalUser] = useState<IUser>(user);
+  const [hasChanges, setHasChanges] = useState<boolean>(false);
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    setOriginalUser({ ...editableUser });
+  };
+
+  const handleCancel = () => {
+    setEditableUser({ ...originalUser });
+    setIsEditing(false);
+    setHasChanges(false);
+  };
+
+  const handleSave = () => {
+    console.log('Сохраненные данные:', editableUser);
+    setIsEditing(false);
+    setHasChanges(false);
+    setOriginalUser({ ...editableUser });
+
+    if (onUserUpdate) {
+      onUserUpdate(editableUser);
+    }
+  };
+
+  const handleInputChange = (field: keyof IUser, value: string) => {
+    const updatedUser = { ...editableUser, [field]: value };
+    setEditableUser(updatedUser);
+
+    // Проверяем изменения
+    const hasActualChanges = JSON.stringify(updatedUser) !== JSON.stringify(originalUser);
+    setHasChanges(hasActualChanges);
+  };
 
   return (
     <div className="account_user-data">
-      <label className="account_user-label">
-        ФИО:
-        <Input disabled className="account_user-label-text" value={editableUser.fio} />
-      </label>
-      <label className="account_user-label">
-        Телефон:
-        <Input disabled className="account_user-label-text" value={editableUser.phone} />
-      </label>
-      <label className="account_user-label">
-        Email:
-        <Input disabled className="account_user-label-text" value={editableUser.email} />
-      </label>
+      <div className="account_user-field">
+        <label className="account_user-label">ФИО:</label>
+        <Input
+          disabled={!isEditing}
+          className="account_user-label-text"
+          value={editableUser.fio}
+          onValueChange={(value) => handleInputChange('fio', value)}
+          classNames={{
+            input: isEditing ? '!bg-white' : '',
+            inputWrapper: isEditing ? '!bg-white data-[hover=true]:!bg-white' : '',
+          }}
+        />
+      </div>
+
+      <div className="account_user-field">
+        <label className="account_user-label">Телефон:</label>
+        <Input
+          disabled={!isEditing}
+          className="account_user-label-text"
+          value={editableUser.phone}
+          type="number"
+          onValueChange={(value) => handleInputChange('phone', value)}
+          classNames={{
+            input: isEditing ? '!bg-white' : '',
+            inputWrapper: isEditing ? '!bg-white data-[hover=true]:!bg-white' : '',
+          }}
+        />
+      </div>
+
+      <div className="account_user-field">
+        <label className="account_user-label">Email:</label>
+        <Input
+          disabled={!isEditing}
+          className="account_user-label-text"
+          value={editableUser.email}
+          type="email"
+          onValueChange={(value) => handleInputChange('email', value)}
+          classNames={{
+            input: isEditing ? '!bg-white' : '',
+            inputWrapper: isEditing ? '!bg-white data-[hover=true]:!bg-white' : '',
+          }}
+        />
+      </div>
+      <div className="account_user-actions">
+        {!isEditing ? (
+          <Button color="default" className="account__editBtn" variant="ghost" onPress={handleEdit}>
+            Редактировать
+          </Button>
+        ) : (
+          <div className="account_user-actions">
+            <Button
+              color="primary"
+              className="account__saveBtn"
+              variant="solid"
+              onPress={handleSave}
+              isDisabled={!hasChanges}>
+              Сохранить
+            </Button>
+            <Button
+              color="default"
+              className="account__cancelBtn"
+              variant="bordered"
+              onPress={handleCancel}>
+              Отмена
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -120,16 +197,13 @@ const processKeypointData = (data: KeypointData, keypoint: string): KeypointCoor
   const keypointCoordinates: KeypointCoordinates = [];
 
   try {
-    // Преобразуем MobX Proxy в обычный объект
     const plainData = JSON.parse(JSON.stringify(data));
 
-    // Проверяем, что данные являются массивом
     if (!Array.isArray(plainData)) {
       console.error('Expected data to be an array, got:', typeof plainData);
       return keypointCoordinates;
     }
 
-    // Обрабатываем каждый кадр
     for (const frameData of plainData) {
       if (!frameData || typeof frameData !== 'object') {
         continue;
@@ -143,13 +217,10 @@ const processKeypointData = (data: KeypointData, keypoint: string): KeypointCoor
       const frame = frameKeys[0];
       const items = frameData[frame];
 
-      // Проверяем, что items является массивом
       if (!Array.isArray(items)) {
-        console.warn(`Items for frame ${frame} is not an array:`, items);
         continue;
       }
 
-      // Обрабатываем каждый элемент в кадре
       for (const item of items) {
         if (item && item.keypoint === keypoint && item.position) {
           keypointCoordinates.push({
@@ -170,11 +241,18 @@ const processKeypointData = (data: KeypointData, keypoint: string): KeypointCoor
 const processParameterData = (data: ParamsData, parameter: string): KeypointCoordinates => {
   const parameterValues: KeypointCoordinates = [];
 
+  if (!data || !Array.isArray(data)) {
+    return parameterValues;
+  }
+
   data.forEach((paramSet, index) => {
+    if (!paramSet || typeof paramSet !== 'object') {
+      return;
+    }
+
     const value = paramSet[parameter as keyof typeof paramSet];
 
     if (Array.isArray(value)) {
-      // Если параметр является массивом (например, knee_valgus_varus)
       value.forEach((val, arrayIndex) => {
         parameterValues.push({
           frame: `${index}_${arrayIndex}`,
@@ -183,7 +261,6 @@ const processParameterData = (data: ParamsData, parameter: string): KeypointCoor
         });
       });
     } else if (typeof value === 'number') {
-      // Если параметр - просто число
       parameterValues.push({
         frame: `${index}`,
         x: index + 1,
@@ -197,8 +274,8 @@ const processParameterData = (data: ParamsData, parameter: string): KeypointCoor
 
 export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
   type Key = string | number;
-  const keypoints = functionalDataStore.keypoints;
-  const parameters = functionalDataStore.parameters;
+  const keypoints = functionalDataStore.keypoints || [];
+  const parameters = functionalDataStore.parameters || [];
 
   const [data, setData] = useState<KeypointData | ParamsData | null>(null);
   const [coordinates, setCoordinates] = useState<KeypointCoordinates>([]);
@@ -208,8 +285,8 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
   const columns = [
     { key: 'timestamp', label: 'Дата действия' },
     { key: 'description', label: 'Описание' },
-    { key: 'download', label: 'Скачать PDF' },
-    { key: 'more' },
+    { key: 'download', label: 'PDF' },
+    { key: 'more', label: 'Действия' },
   ];
 
   const handleDownload = (pdfUrl: string) => {
@@ -239,19 +316,19 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
 
   useEffect(() => {
     if (activeTab === 'graphics') {
-      setData(null);
-      setData(keypoints);
+      setData(keypoints as KeypointData);
     } else if (activeTab === 'parametrs') {
       setData(parameters as ParamsData);
     }
   }, [activeTab, keypoints, parameters]);
 
-  const handleSelectionChange = (keys: SharedSelection) => {
+  const handleSelectionChange = (keys: any) => {
     if (typeof keys === 'string') {
       setSelectedOption(new Set([keys]));
-    } else {
-      const stringKeys = new Set(Array.from(keys).map((k) => k.toString()));
-      setSelectedOption(stringKeys);
+    } else if (keys instanceof Set) {
+      setSelectedOption(keys);
+    } else if (keys && typeof keys === 'object' && 'currentKey' in keys) {
+      setSelectedOption(new Set([keys.currentKey]));
     }
   };
 
@@ -354,92 +431,83 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
     return activeTab === 'graphics' ? 'Выберите часть тела' : 'Выберите параметр';
   };
 
-  // Проверяем, что выбранное значение существует в текущих опциях
   const getSafeSelectedKeys = () => {
     const currentOptions = getCurrentOptions();
     const selectedKey = Array.from(selectedOption)[0];
 
-    // Если выбранный ключ существует в текущих опциях, используем его
     if (currentOptions.some((option) => option.key === selectedKey)) {
       return selectedOption;
     }
 
-    // Иначе используем первый доступный вариант
     return new Set([currentOptions[0]?.key || '']);
   };
 
+  const chartData = coordinates.map((point) => point.y) || [];
+  const xAxisData = coordinates.map((_point, index) => index + 1) || [];
+
   return (
     <div>
-      <h2 style={{ marginBottom: '10px' }}>История действий:</h2>
-      {actions.length === 0 ? (
-        <p>История пуста</p>
+      <h2 className="account__history-title">История действий:</h2>
+      {!actions || actions.length === 0 ? (
+        <p className="account__history account__history-empty">История пуста</p>
       ) : (
         <>
-          <Table aria-label="История действий">
+          <Table aria-label="Action history table">
             <TableHeader columns={columns}>
               {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
             </TableHeader>
             <TableBody items={actions}>
               {(action) => (
                 <TableRow key={action.id}>
-                  {(columnKey) => {
-                    if (columnKey === 'timestamp') {
-                      return <TableCell>{action.timestamp.toLocaleString()}</TableCell>;
-                    }
-                    if (columnKey === 'description') {
-                      return <TableCell>{action.description}</TableCell>;
-                    }
-                    if (columnKey === 'download') {
-                      return (
-                        <TableCell>
-                          <button onClick={() => handleDownload(action.pdfUrl)}>Скачать PDF</button>
-                        </TableCell>
-                      );
-                    }
-                    if (columnKey === 'more') {
-                      return (
-                        <TableCell>
-                          <Button
-                            onPress={() => handleOpenModal(action)}
-                            className="account__btn account__btn--log">
-                            Подробнее
-                          </Button>
-                        </TableCell>
-                      );
-                    }
-                    return <TableCell>{''}</TableCell>;
-                  }}
+                  <TableCell>{action.timestamp.toLocaleString()}</TableCell>
+                  <TableCell>{action.description}</TableCell>
+                  <TableCell>
+                    <button onClick={() => handleDownload(action.pdfUrl)}>Скачать PDF</button>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      onPress={() => handleOpenModal(action)}
+                      className="account__btn account__btn--log">
+                      Подробнее
+                    </Button>
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
+
           <Modal
             size={'2xl'}
             backdrop="blur"
             isOpen={isOpen}
             scrollBehavior="inside"
             style={{ marginTop: '150px' }}
-            onOpenChange={onOpenChange}>
+            onOpenChange={onOpenChange}
+            aria-modal="true"
+            role="dialog"
+            shouldBlockScroll={true}
+            disableAnimation={false}>
             <ModalContent>
               {(onClose) => (
                 <>
                   <ModalHeader
-                    className="account__modal-title "
+                    className="account__modal-title"
                     style={{ borderBottom: '2px solid rgb(210, 210, 210)' }}>
                     {modalData?.date}
                   </ModalHeader>
-                  <ModalBody>
+                  <ModalBody className="account__modal-body ">
                     <div className="account__modal-description ">
                       Описание: {modalData?.description}
                     </div>
                     <div className="account__modal-description account__modal-description--fz16 ">
                       Прикрепленное видео: {modalData?.video}
                     </div>
+
                     <div className="account__tabs_wrapper">
                       <Tabs
-                        aria-label="Dynamic tabs"
-                        className=""
+                        aria-label="Analysis data tabs"
                         selectedKey={activeTab}
+                        className="md:pl-0 pl-5"
                         onSelectionChange={(key) => handleTabChange(key as string)}>
                         <Tab key="graphics" title="Графики">
                           <div className="account__tab-content">
@@ -450,46 +518,51 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
                               onSelectionChange={handleSelectionChange}
                               label={getSelectLabel()}
                               aria-label={getSelectLabel()}
-                              selectionMode="single">
+                              selectionMode="single"
+                              disallowEmptySelection>
                               {getCurrentOptions().map((kp) => (
-                                <SelectItem key={kp.key}>{kp.label}</SelectItem>
+                                <SelectItem key={kp.key} textValue={kp.label}>
+                                  {kp.label}
+                                </SelectItem>
                               ))}
                             </Select>
                             <h2 className="account__modal-graphic-title">График</h2>
 
                             <div className="account__graphic">
-                              <LineChart
-                                xAxis={[
-                                  {
-                                    label: activeTab === 'graphics' ? 'Координата по X' : 'Кадры',
-                                    data: coordinates.map((_point, index) => index + 1) || [],
-                                    min: value[0],
-                                    max: value[1],
-                                  },
-                                ]}
-                                yAxis={[
-                                  {
-                                    label:
-                                      activeTab === 'graphics' ? 'Координата по Y' : 'Значения',
-                                  },
-                                ]}
-                                series={[
-                                  {
-                                    data: coordinates.map((point) => point.y) || [],
-                                    color: 'black',
-                                  },
-                                ]}
-                                className="account__graphic"
-                                grid={{ vertical: true, horizontal: true }}
-                              />
-                              <Slider
-                                value={value}
-                                onChange={handleChange}
-                                valueLabelDisplay="auto"
-                                min={0}
-                                max={240}
-                                className="account__graphic_slider"
-                              />
+                              <>
+                                <LineChart
+                                  xAxis={[
+                                    {
+                                      label: activeTab === 'graphics' ? 'Координата по X' : 'Кадры',
+                                      data: xAxisData,
+                                      min: value[0],
+                                      max: value[1],
+                                    },
+                                  ]}
+                                  yAxis={[
+                                    {
+                                      label:
+                                        activeTab === 'graphics' ? 'Координата по Y' : 'Значения',
+                                    },
+                                  ]}
+                                  series={[
+                                    {
+                                      data: chartData,
+                                      color: 'black',
+                                    },
+                                  ]}
+                                  className="account__graphic"
+                                  grid={{ vertical: true, horizontal: true }}
+                                />
+                                <Slider
+                                  value={value}
+                                  onChange={handleChange}
+                                  valueLabelDisplay="auto"
+                                  min={0}
+                                  max={240}
+                                  className="account__graphic_slider"
+                                />
+                              </>
                             </div>
                           </div>
                         </Tab>
@@ -501,45 +574,50 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
                               selectedKeys={getSafeSelectedKeys()}
                               onSelectionChange={handleSelectionChange}
                               label={getSelectLabel()}
-                              selectionMode="single">
+                              selectionMode="single"
+                              disallowEmptySelection>
                               {getCurrentOptions().map((kp) => (
-                                <SelectItem key={kp.key}>{kp.label}</SelectItem>
+                                <SelectItem key={kp.key} textValue={kp.label}>
+                                  {kp.label}
+                                </SelectItem>
                               ))}
                             </Select>
                             <h2 className="account__modal-graphic-title">График</h2>
 
                             <div className="account__graphic">
-                              <LineChart
-                                xAxis={[
-                                  {
-                                    label: activeTab === 'graphics' ? 'Кадры' : 'Измерения',
-                                    data: coordinates.map((_point, index) => index + 1) || [],
-                                    min: value[0],
-                                    max: value[1],
-                                  },
-                                ]}
-                                yAxis={[
-                                  {
-                                    label: activeTab === 'graphics' ? 'Координаты' : 'Значения',
-                                  },
-                                ]}
-                                series={[
-                                  {
-                                    data: coordinates.map((point) => point.y) || [],
-                                    color: 'black',
-                                  },
-                                ]}
-                                className="account__graphic"
-                                grid={{ vertical: true, horizontal: true }}
-                              />
-                              <Slider
-                                value={value}
-                                onChange={handleChange}
-                                valueLabelDisplay="auto"
-                                min={0}
-                                max={240}
-                                className="account__graphic_slider"
-                              />
+                              <>
+                                <LineChart
+                                  xAxis={[
+                                    {
+                                      label: 'Измерения',
+                                      data: xAxisData,
+                                      min: value[0],
+                                      max: value[1],
+                                    },
+                                  ]}
+                                  yAxis={[
+                                    {
+                                      label: 'Значения',
+                                    },
+                                  ]}
+                                  series={[
+                                    {
+                                      data: chartData,
+                                      color: 'black',
+                                    },
+                                  ]}
+                                  className="account__graphic"
+                                  grid={{ vertical: true, horizontal: true }}
+                                />
+                                <Slider
+                                  value={value}
+                                  onChange={handleChange}
+                                  valueLabelDisplay="auto"
+                                  min={0}
+                                  max={240}
+                                  className="account__graphic_slider"
+                                />
+                              </>
                             </div>
                           </div>
                         </Tab>
@@ -550,9 +628,9 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
                     <Button color="default" variant="light" onPress={onClose}>
                       Закрыть
                     </Button>
-                    <Button color="default" variant="bordered" onPress={onClose}>
+                    {/* <Button color="default" variant="bordered" onPress={onClose}>
                       Редактировать
-                    </Button>
+                    </Button> */}
                   </ModalFooter>
                 </>
               )}
@@ -565,15 +643,40 @@ export const ActionHistory: React.FC<ActionHistoryProps> = ({ actions }) => {
 };
 
 export const Account = () => {
-  const location = useLocation();
-  let user = location.state?.user;
+  const defaultUser: IUser = {
+    id: '0',
+    fio: 'Неизвестный пользователь',
+    phone: '780080080',
+    history: [
+      {
+        id: '1',
+        timestamp: new Date(),
+        description: 'Первичная оценка позвоночника Захиров И.А.',
+        pdfUrl: 'https://example.com/action1.pdf',
+      },
+      {
+        id: '2',
+        timestamp: new Date(),
+        description: 'Первичная оценка шейного отдела Захиров И.А.',
+        pdfUrl: 'https://example.com/action1.pdf',
+      },
+    ],
+    roll: 'patient',
+    email: 'Не указан',
+  };
 
-  const [editableUser, _setEditableUser] = useState<User>(user);
+  const [editableUser, setEditableUser] = useState<IUser>(userStore.user || defaultUser);
 
   const renderRole = () => {
     if (editableUser.roll === 'doctor') {
       return 'врача';
     } else return 'пациента';
+  };
+
+  const handleUserUpdate = (updatedUser: IUser) => {
+    setEditableUser(updatedUser);
+    // Здесь можно добавить логику сохранения на сервер
+    console.log('Пользователь обновлен:', updatedUser);
   };
 
   const reviewsRef = useRef(null);
@@ -587,24 +690,20 @@ export const Account = () => {
           <div className="account_wrapper">
             <div className="account_title-block">
               <h1 className="account_title">Личный кабинет {renderRole()}</h1>
-
-              <Button color="default" className="account__editBtn" variant="ghost">
-                Редактировать
-              </Button>
             </div>
             <div className="account_user">
               <Image
                 isZoomed
-                alt="Image"
+                alt="User avatar"
                 className="account_user-img"
                 src={
-                  'https://app.requestly.io/delay/1000/https://www.iso.org/files/live/sites/isoorg/files/events/2024/AM/dummy/avatar-white.png/thumbnails/900x900'
+                  'https://app.requestly.io/delay/500/https://www.iso.org/files/live/sites/isoorg/files/events/2024/AM/dummy/avatar-white.png/thumbnails/900x900'
                 }
               />
-              <UserProfile user={user} />
+              <UserProfile user={editableUser} onUserUpdate={handleUserUpdate} />
             </div>
             <div>
-              <ActionHistory actions={user.history} />
+              <ActionHistory actions={editableUser.history} />
             </div>
           </div>
         </div>

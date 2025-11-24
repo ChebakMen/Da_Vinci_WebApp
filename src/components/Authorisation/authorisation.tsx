@@ -7,58 +7,20 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from '../Header/header';
 import Footer from '../Footer/footer';
 
+import userStore from '../../stores/user';
+
 export const Authorisation = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, _setError] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    // Проверяем email и пароль
-    if (email === 'user@gmail.com' && password === '12345') {
-      navigate('/account', {
-        state: {
-          user: {
-            email,
-            fio: 'Иванов Евгений Олегович',
-            history: [],
-            img: 'https://app.requestly.io/delay/2000/https://amiel.club/uploads/posts/2022-03/1647762844_3-amiel-club-p-kartinki-litsa-cheloveka-3.png',
-            phone: '88001821212',
-            roll: 'patient',
-            id: 2,
-          },
-        },
-      });
-    } else if (email === 'doctor@gmail.com' && password === '12345') {
-      navigate('/account', {
-        state: {
-          user: {
-            email,
-            fio: 'Дубров Алексей Александрович',
-            history: [
-              {
-                id: '1',
-                timestamp: new Date(),
-                description: 'Первичная оценка позвоночника Захиров И.А.',
-                pdfUrl: 'https://example.com/action1.pdf',
-              },
-              {
-                id: '2',
-                timestamp: new Date(),
-                description: 'Первичная оценка шейного отдела Захиров И.А.',
-                pdfUrl: 'https://example.com/action1.pdf',
-              },
-            ],
-            img: 'https://app.requestly.io/delay/2000/https://www.iso.org/files/live/sites/isoorg/files/events/2024/AM/dummy/avatar-white.png/thumbnails/900x900',
-            phone: '882123012',
-            roll: 'doctor',
-            id: 3,
-          },
-        },
-      });
-    } else {
-      setError('Неверный email или пароль');
-    }
+    userStore.login(email, password).then(() => {
+      if (userStore.user !== null) {
+        navigate('/account');
+      }
+    });
   };
 
   //убрать потом

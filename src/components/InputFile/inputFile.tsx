@@ -90,13 +90,8 @@ export const InputFile: React.FC<InputFileProps> = ({ onFileLoaded }) => {
         //   method: 'GET',
         // });
 
-        // Старый без параметров
-        // const result = await fetch('https://mocki.io/v1/05cca9d5-8014-4841-94ab-f899d2cf2af9', {
-        //   method: 'GET',
-        // });
-
         // Весь файл
-        const result = await fetch('https://mocki.io/v1/3279e0b8-66ff-44a5-a73a-5270d0379909', {
+        const result = await fetch('https://mocki.io/v1/84554ddd-a08a-4dfd-b429-3e97add8647a', {
           method: 'GET',
         });
 
@@ -105,12 +100,6 @@ export const InputFile: React.FC<InputFileProps> = ({ onFileLoaded }) => {
         console.log(newKeypoints);
         setStatus('success');
         onFileLoaded(newKeypoints);
-        // onFileLoaded({
-        //   frame_1: [
-        //     { keypoint: 'nose', position: { x: 10, y: 20 } },
-        //     { keypoint: 'eye', position: { x: 15, y: 25 } },
-        //   ],
-        // });
       } catch (error) {
         console.error(error);
         setStatus('fail');
