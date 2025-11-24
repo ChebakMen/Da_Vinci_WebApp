@@ -1,3 +1,5 @@
+в env VITE_SERVER_URL ='http://localhost:3000/api'
+
 по api/login передаю email, password для аутентификации
 по /registration" передаю email, password для регистрации
 по /logout разлогинимся
